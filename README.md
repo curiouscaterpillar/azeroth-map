@@ -1,6 +1,6 @@
 # Azeroth Map
 
-A minimal, single-file interactive map of Azeroth. No build step and no dependencies: open `index.html` in a browser.
+A minimal interactive map of Azeroth: one HTML page plus a map image. No build step and no dependencies: open `index.html` in a browser.
 
 - Base map is a photo of a printed Azeroth map (`assets/azeroth.jpg`) showing Kalimdor, the Eastern Kingdoms, Northrend and the Maelstrom
 - About 45 clickable zones colored by faction, with short descriptions

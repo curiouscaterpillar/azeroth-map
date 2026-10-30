@@ -5,24 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Azeroth Map</title>
 <style>
-  :root { --sea:#12324a; --sea2:#0b2236; --land:#c9b47e; --edge:#6b5a33; --ink:#f3e9cf; --panel:#1b1610ee; --gold:#e8c26a; }
+  :root { --bg:#16110b; --edge:#6b5a33; --ink:#f3e9cf; --panel:#1b1610ee; --gold:#e8c26a; }
   * { box-sizing:border-box; }
-  html, body { margin:0; height:100%; background:var(--sea2); color:var(--ink); font:14px/1.4 Georgia, serif; overflow:hidden; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--ink); font:14px/1.4 Georgia, serif; overflow:hidden; }
   #map { width:100vw; height:100vh; display:block; cursor:grab; touch-action:none; }
   #map.drag { cursor:grabbing; }
-  .land { fill:var(--land); stroke:var(--edge); stroke-width:2; }
-  .land:hover { fill:#d8c48e; }
-  .cont-label { fill:#3b2f16; font-size:22px; font-weight:bold; letter-spacing:4px; text-anchor:middle; pointer-events:none; opacity:.55; }
   .zone circle { stroke:#1b1610; stroke-width:1.5; cursor:pointer; transition:r .15s; }
   .zone:hover circle, .zone.active circle { r:9; }
-  .zone text { font-size:10px; fill:#1b1610; text-anchor:middle; pointer-events:none; font-weight:bold; }
+  .zone text { font-size:10px; fill:#f3e9cf; stroke:#1b1610; stroke-width:3px; paint-order:stroke; text-anchor:middle; pointer-events:none; font-weight:bold; }
   .zone text { opacity:0; transition:opacity .15s; }
   .zoomed .zone text, .zone:hover text, .zone.active text { opacity:1; }
   .zone.dim { opacity:.15; }
   .alliance circle { fill:#3a6fd8; } .horde circle { fill:#c8352d; }
   .contested circle { fill:#e8c26a; } .neutral circle { fill:#9ad06a; }
-  .maelstrom { fill:none; stroke:#7fd1ff; stroke-width:2; stroke-dasharray:6 5; animation:spin 12s linear infinite; transform-origin:500px 370px; }
-  @keyframes spin { to { transform:rotate(360deg); } }
   #ui { position:fixed; top:12px; left:12px; width:min(300px, calc(100vw - 24px)); background:var(--panel); border:1px solid var(--gold); border-radius:8px; padding:12px; }
   h1 { margin:0 0 8px; font-size:18px; color:var(--gold); }
   input { width:100%; padding:6px 8px; border-radius:4px; border:1px solid var(--edge); background:#0f0c08; color:var(--ink); font:inherit; }
@@ -36,30 +31,10 @@
 </style>
 </head>
 <body>
-<svg id="map" viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="seaGrad" cx="50%" cy="50%" r="70%">
-      <stop offset="0" stop-color="#1d4a6b"/><stop offset="1" stop-color="#0b2236"/>
-    </radialGradient>
-  </defs>
-  <rect x="-2000" y="-2000" width="5000" height="5000" fill="url(#seaGrad)"/>
+<svg id="map" viewBox="0 0 1000 655" xmlns="http://www.w3.org/2000/svg">
+  <rect x="-3000" y="-3000" width="7000" height="7000" fill="#16110b"/>
   <g id="world">
-    <!-- Hand-drawn, stylized continent outlines (not to scale) -->
-    <path class="land" data-cont="Kalimdor" d="M150 130 C210 100 290 120 310 170 C330 220 300 260 320 300 C345 350 330 400 300 430 C280 460 300 520 270 570 C240 620 180 640 150 600 C120 560 140 520 110 480 C80 440 100 380 90 330 C80 270 100 170 150 130Z"/>
-    <path class="land" d="M235 640 C255 625 285 630 290 650 C280 670 245 668 235 640Z"/>
-    <path class="land" data-cont="Eastern Kingdoms" d="M760 110 C810 90 870 120 860 170 C850 210 880 240 870 280 C860 330 900 360 880 410 C860 450 870 500 840 540 C810 590 760 620 720 600 C690 580 720 540 700 500 C680 460 720 430 710 390 C700 340 730 300 720 250 C710 200 720 130 760 110Z"/>
-    <path class="land" data-cont="Northrend" d="M360 70 C400 30 480 20 540 30 C610 40 680 40 700 80 C710 110 660 130 610 120 C560 112 520 140 470 130 C420 120 370 125 355 105 C348 95 350 80 360 70Z"/>
-    <path class="land" data-cont="Pandaria" d="M440 560 C470 530 540 525 580 545 C610 560 610 610 580 635 C550 660 490 660 460 640 C430 620 420 585 440 560Z"/>
-    <path class="land" data-cont="Broken Isles" d="M570 270 C590 255 625 262 630 285 C635 305 610 320 590 315 C565 310 555 285 570 270Z"/>
-    <path class="land" d="M640 300 C650 292 664 298 660 310 C655 318 640 314 640 300Z"/>
-    <path class="land" data-cont="Dragon Isles" d="M870 40 C900 25 940 35 945 60 C950 85 920 100 895 92 C870 85 855 58 870 40Z"/>
-    <circle class="maelstrom" cx="500" cy="370" r="28"/>
-    <circle class="maelstrom" cx="500" cy="370" r="14" style="animation-duration:6s"/>
-    <text class="cont-label" x="210" y="370">KALIMDOR</text>
-    <text class="cont-label" x="790" y="370" transform="rotate(-90 790 370)">EASTERN KINGDOMS</text>
-    <text class="cont-label" x="530" y="85">NORTHREND</text>
-    <text class="cont-label" x="520" y="600" style="font-size:16px">PANDARIA</text>
-    <text class="cont-label" x="500" y="420" style="font-size:12px;fill:#bfe8ff;opacity:.8">The Maelstrom</text>
+    <image href="assets/azeroth.jpg" x="0" y="0" width="1000" height="655"/>
     <g id="zones"></g>
   </g>
 </svg>
@@ -82,59 +57,54 @@
 <script>
 const ZONES = [
   // Kalimdor
-  ["Orgrimmar","Kalimdor","horde",270,250,"Capital of the Horde, carved into the red canyons of Durotar."],
-  ["Durotar","Kalimdor","horde",290,290,"Harsh, rocky homeland of the orcs, named after Durotan."],
-  ["Thunder Bluff","Kalimdor","horde",200,330,"Tauren capital atop towering mesas in Mulgore."],
-  ["The Barrens","Kalimdor","horde",240,350,"Vast savanna crossroads of Kalimdor."],
-  ["Ashenvale","Kalimdor","contested",200,220,"Ancient night elf forest, long fought over by orc loggers."],
-  ["Darkshore","Kalimdor","alliance",180,165,"Misty northern coast of the night elves."],
-  ["Teldrassil","Kalimdor","alliance",140,140,"The great World Tree off Kalimdor's northwest coast."],
-  ["Mount Hyjal","Kalimdor","neutral",255,180,"Sacred mountain and home of Nordrassil."],
-  ["Winterspring","Kalimdor","neutral",290,145,"Snowy valleys home to Everlook and frostsabers."],
-  ["Feralas","Kalimdor","contested",140,430,"Lush jungle of ancient elven ruins and giants."],
-  ["Desolace","Kalimdor","contested",120,370,"Barren wasteland haunted by centaur clans."],
-  ["Dustwallow Marsh","Kalimdor","contested",285,410,"Swamp home to Theramore and the black dragon Onyxia."],
-  ["Thousand Needles","Kalimdor","contested",220,460,"Towering stone spires, flooded in the Cataclysm."],
-  ["Tanaris","Kalimdor","neutral",260,520,"Desert home of Gadgetzan and the Caverns of Time."],
-  ["Un'Goro Crater","Kalimdor","neutral",190,520,"Primeval crater full of dinosaurs and Titan secrets."],
-  ["Silithus","Kalimdor","neutral",150,560,"Insect-plagued desert where Sargeras' sword struck."],
-  ["Uldum","Kalimdor","neutral",210,590,"Titan-forged land of the tol'vir."],
+  ["Teldrassil","Kalimdor","alliance",150,160,"The great World Tree off Kalimdor's northwest coast."],
+  ["Azuremyst Isle","Kalimdor","alliance",75,245,"Island where the draenei's ship, the Exodar, crashed."],
+  ["Darkshore","Kalimdor","alliance",215,215,"Misty northern coast of the night elves."],
+  ["Winterspring","Kalimdor","neutral",290,215,"Snowy valleys home to Everlook and frostsabers."],
+  ["Mount Hyjal","Kalimdor","neutral",262,250,"Sacred mountain and home of Nordrassil."],
+  ["Ashenvale","Kalimdor","contested",215,282,"Ancient night elf forest, long fought over by orc loggers."],
+  ["Orgrimmar","Kalimdor","horde",298,305,"Capital of the Horde, carved into the red canyons of Durotar."],
+  ["Durotar","Kalimdor","horde",302,348,"Harsh, rocky homeland of the orcs, named after Durotan."],
+  ["Desolace","Kalimdor","contested",148,360,"Barren wasteland haunted by centaur clans."],
+  ["The Barrens","Kalimdor","horde",245,372,"Vast savanna crossroads of Kalimdor."],
+  ["Thunder Bluff","Kalimdor","horde",190,405,"Tauren capital atop towering mesas in Mulgore."],
+  ["Dustwallow Marsh","Kalimdor","contested",282,432,"Swamp home to Theramore and the black dragon Onyxia."],
+  ["Feralas","Kalimdor","contested",145,452,"Lush jungle of ancient elven ruins and giants."],
+  ["Thousand Needles","Kalimdor","contested",225,470,"Towering stone spires, flooded in the Cataclysm."],
+  ["Un'Goro Crater","Kalimdor","neutral",195,518,"Primeval crater full of dinosaurs and Titan secrets."],
+  ["Tanaris","Kalimdor","neutral",265,530,"Desert home of Gadgetzan and the Caverns of Time."],
+  ["Silithus","Kalimdor","neutral",145,545,"Insect-plagued desert where Sargeras' sword struck."],
+  ["Uldum","Kalimdor","neutral",195,582,"Titan-forged land of the tol'vir."],
   // Eastern Kingdoms
-  ["Stormwind City","Eastern Kingdoms","alliance",735,505,"Shining capital of the human kingdom and the Alliance."],
-  ["Elwynn Forest","Eastern Kingdoms","alliance",760,520,"Peaceful farmland and forest around Stormwind."],
-  ["Westfall","Eastern Kingdoms","alliance",720,540,"Farmland troubled by the Defias Brotherhood."],
-  ["Duskwood","Eastern Kingdoms","contested",760,555,"Ever-dark forest stalked by worgen and undead."],
-  ["Stranglethorn Vale","Eastern Kingdoms","contested",760,590,"Dense jungle of trolls, pirates, and Booty Bay."],
-  ["Redridge Mountains","Eastern Kingdoms","alliance",800,505,"Rugged hills overrun by gnolls and orcs."],
-  ["Burning Steppes","Eastern Kingdoms","contested",790,470,"Scorched land below Blackrock Mountain."],
-  ["Searing Gorge","Eastern Kingdoms","contested",770,440,"Volcanic pit of the Dark Iron dwarves."],
-  ["Ironforge","Eastern Kingdoms","alliance",780,385,"Dwarven capital hewn into the mountain Khaz Modan."],
-  ["Dun Morogh","Eastern Kingdoms","alliance",760,395,"Snowy home of dwarves and gnomes."],
-  ["Wetlands","Eastern Kingdoms","contested",780,330,"Rain-soaked marsh dividing north and south."],
-  ["Arathi Highlands","Eastern Kingdoms","contested",800,280,"Former seat of the ancient human kingdom of Arathor."],
-  ["Hillsbrad Foothills","Eastern Kingdoms","horde",760,265,"Rolling hills and the town of Tarren Mill."],
-  ["Undercity","Eastern Kingdoms","horde",760,200,"Forsaken capital beneath the ruins of Lordaeron."],
-  ["Tirisfal Glades","Eastern Kingdoms","horde",740,180,"Gloomy homeland of the Forsaken."],
-  ["Eastern Plaguelands","Eastern Kingdoms","contested",840,190,"Blighted land still scarred by the Scourge."],
-  ["Silvermoon City","Eastern Kingdoms","horde",820,130,"Blood elf capital in Quel'Thalas."],
-  ["Hinterlands","Eastern Kingdoms","contested",830,240,"Wild highlands of the Wildhammer dwarves and trolls."],
-  ["Blasted Lands","Eastern Kingdoms","contested",820,560,"Demon-scarred land around the Dark Portal."],
+  ["Silvermoon City","Eastern Kingdoms","horde",868,160,"Blood elf capital in Quel'Thalas."],
+  ["Eastern Plaguelands","Eastern Kingdoms","contested",862,215,"Blighted land still scarred by the Scourge."],
+  ["Undercity","Eastern Kingdoms","horde",772,238,"Forsaken capital beneath the ruins of Lordaeron."],
+  ["Tirisfal Glades","Eastern Kingdoms","horde",738,252,"Gloomy homeland of the Forsaken."],
+  ["Hinterlands","Eastern Kingdoms","contested",862,262,"Wild highlands of the Wildhammer dwarves and trolls."],
+  ["Hillsbrad Foothills","Eastern Kingdoms","horde",780,312,"Rolling hills and the town of Tarren Mill."],
+  ["Arathi Highlands","Eastern Kingdoms","contested",852,292,"Former seat of the ancient human kingdom of Arathor."],
+  ["Wetlands","Eastern Kingdoms","contested",805,352,"Rain-soaked marsh dividing north and south."],
+  ["Dun Morogh","Eastern Kingdoms","alliance",785,402,"Snowy home of dwarves and gnomes."],
+  ["Ironforge","Eastern Kingdoms","alliance",812,392,"Dwarven capital hewn into the mountain Khaz Modan."],
+  ["Searing Gorge","Eastern Kingdoms","contested",840,432,"Volcanic pit of the Dark Iron dwarves."],
+  ["Burning Steppes","Eastern Kingdoms","contested",842,465,"Scorched land below Blackrock Mountain."],
+  ["Stormwind City","Eastern Kingdoms","alliance",788,488,"Shining capital of the human kingdom and the Alliance."],
+  ["Elwynn Forest","Eastern Kingdoms","alliance",822,506,"Peaceful farmland and forest around Stormwind."],
+  ["Redridge Mountains","Eastern Kingdoms","alliance",862,495,"Rugged hills overrun by gnolls and orcs."],
+  ["Westfall","Eastern Kingdoms","alliance",775,525,"Farmland troubled by the Defias Brotherhood."],
+  ["Duskwood","Eastern Kingdoms","contested",820,532,"Ever-dark forest stalked by worgen and undead."],
+  ["Blasted Lands","Eastern Kingdoms","contested",862,548,"Demon-scarred land around the Dark Portal."],
+  ["Stranglethorn Vale","Eastern Kingdoms","contested",800,568,"Dense jungle of trolls, pirates, and Booty Bay."],
   // Northrend
-  ["Borean Tundra","Northrend","contested",400,90,"Frozen western shore home to the tuskarr."],
-  ["Dragonblight","Northrend","contested",480,95,"Ancient dragon graveyard and Wyrmrest Temple."],
-  ["Icecrown","Northrend","contested",510,55,"Seat of the Lich King's Frozen Throne."],
-  ["Howling Fjord","Northrend","contested",660,90,"Fjords of the vrykul on Northrend's east coast."],
-  ["Dalaran","Northrend","neutral",560,85,"Floating city of the Kirin Tor mages."],
-  ["Storm Peaks","Northrend","neutral",590,50,"Titan-touched peaks of Ulduar."],
-  // Others
-  ["The Wandering Isle","Pandaria","neutral",480,560,"Giant turtle Shen-zin Su, starting home of the pandaren."],
-  ["Jade Forest","Pandaria","contested",560,570,"Verdant land of the Jade Serpent."],
-  ["Vale of Eternal Blossoms","Pandaria","neutral",515,605,"Heart of Pandaria and the Mogu'shan Palace."],
-  ["Kun-Lai Summit","Pandaria","contested",500,580,"Snowy mountain of monks and yaungol."],
-  ["Suramar","Broken Isles","neutral",600,280,"Arcane night elf city sustained by the Nightwell."],
-  ["Stormheim","Broken Isles","contested",620,300,"Land of the vrykul and the Halls of Valor."],
-  ["Kezan","The Maelstrom","neutral",470,345,"Volcanic goblin home island, now ruined."],
-  ["Valdrakken","Dragon Isles","neutral",910,60,"City of the dragonflights, rebuilt in the Dragon Isles."],
+  ["Borean Tundra","Northrend","contested",410,135,"Frozen western shore home to the tuskarr."],
+  ["Icecrown","Northrend","contested",470,68,"Seat of the Lich King's Frozen Throne."],
+  ["Storm Peaks","Northrend","neutral",560,48,"Titan-touched peaks of Ulduar."],
+  ["Dalaran","Northrend","neutral",540,110,"Floating city of the Kirin Tor mages."],
+  ["Dragonblight","Northrend","contested",480,140,"Ancient dragon graveyard and Wyrmrest Temple."],
+  ["Grizzly Hills","Northrend","contested",612,130,"Pine forests of furbolgs and ancient trolls."],
+  ["Howling Fjord","Northrend","contested",638,188,"Fjords of the vrykul on Northrend's east coast."],
+  // Sea
+  ["The Maelstrom","Great Sea","neutral",530,320,"Endless whirlpool left where the Well of Eternity imploded."],
 ];
 
 const svg = document.getElementById("map");
@@ -161,7 +131,7 @@ function select(g, name, cont, fac, x, y, desc) {
 }
 
 // --- Pan & zoom via viewBox ---
-const BASE = { x:0, y:0, w:1000, h:700 };
+const BASE = { x:0, y:0, w:1000, h:655 };
 let vb = { ...BASE };
 const apply = () => {
   svg.setAttribute("viewBox", `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
@@ -205,12 +175,6 @@ window.addEventListener("pointermove", e => {
   vb.x += drag.x - p.x; vb.y += drag.y - p.y; apply();
 });
 window.addEventListener("pointerup", () => { drag = null; svg.classList.remove("drag"); });
-
-// Clicking a continent shows its name
-document.querySelectorAll(".land[data-cont]").forEach(p => p.addEventListener("click", () => {
-  const n = ZONES.filter(z => z[1] === p.dataset.cont).length;
-  info.innerHTML = `<h2>${p.dataset.cont}</h2><div class="meta">Continent · ${n} zones marked</div>`;
-}));
 
 const centerZoom = f => zoom(f, vb.x + vb.w / 2, vb.y + vb.h / 2);
 document.getElementById("zin").onclick = () => centerZoom(1 / 1.4);
